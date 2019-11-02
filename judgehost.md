@@ -4,7 +4,7 @@ Domjudge 6.0.2
 
 ## 环境
 Ubuntu 18.04，全新安装的系统（Judge 机）。
-关于 Ubuntu 的批量网络安装方式，可以参考[这篇博客](https://blog.cool2645.com/281)。
+关于 Ubuntu 的批量网络安装方式，可以参考[这篇博客](https://blog.cool2645.com/posts/2018-icpc-shenyang-env-config-log/)。
 
 ## 准备工作
 ### 安装依赖包和功能
