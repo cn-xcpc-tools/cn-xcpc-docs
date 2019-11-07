@@ -1,3 +1,3 @@
 # icpcdomdoc
 
-A document about installing Domjudge 6.0.2 when holding a ICPC contest.
+A document about installing Domjudge 7.1.1 when holding a ICPC contest.
