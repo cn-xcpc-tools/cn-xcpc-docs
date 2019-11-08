@@ -2,11 +2,11 @@
 
 ## 版本
 
-Domjudge 6.0.2
+Domjudge 7.1.1
 
 ## 环境
 
-Ubuntu 18.04，全新安装的系统
+Ubuntu 18.04.3 LTS，全新安装的系统
 
 ## 准备工作
 
@@ -19,11 +19,11 @@ sudo apt-get upgrade && sudo apt-get update
 ```shell
 sudo apt install gcc g++ make zip unzip mariadb-server \
         apache2 php php-cli libapache2-mod-php php-zip \
-        php-gd php-curl php-mysql php-json php-xml php-mbstring \
+        php-gd php-curl php-mysql php-json php-xml php-intl php-mbstring \
         acl bsdmainutils ntp phpmyadmin python-pygments \
         libcgroup-dev linuxdoc-tools linuxdoc-tools-text \
         groff texlive-latex-recommended texlive-latex-extra \
-        texlive-fonts-recommended texlive-lang-european
+        texlive-fonts-recommended texlive-lang-european composer
 ```
 
 安装时选择 `apache2`
@@ -40,48 +40,46 @@ sudo phpenmod json
 
 ```shell
 cd Downloads
-wget https://www.domjudge.org/releases/domjudge-6.0.2.tar.gz
+wget https://www.domjudge.org/releases/domjudge-7.1.1.tar.gz
 ```
 
 ```shell
-tar -zxvf domjudge-6.0.2.tar.gz
+tar -zxvf domjudge-7.1.1.tar.gz
 ```
 
 ```shell
-cd domjudge-6.0.2
-./configure --prefix=$HOME/domjudge --with-baseurl=127.0.0.1
+cd domjudge-7.1.1
+./configure --prefix=/opt/domjudge --with-baseurl=127.0.0.1
 make domserver && sudo make install-domserver
-make judgehost && sudo make install-judgehost
 make docs && sudo make install-docs
 ```
 
 ### 配置数据库
 
 ```shell
-cd ~/domjudge/domserver
+cd /opt/domjudge/domserver
 sudo bin/dj_setup_database -u root install
 ```
 
 ### 配置 Web 服务器
 
 ```shell
-cd ~/domjudge/domserver
-sudo ln -s /home/username/domjudge/domserver/etc/apache.conf /etc/apache2/conf-available/domjudge.conf
+cd /opt/domjudge/domserver
+sudo ln -s /opt/domjudge/domserver/etc/apache.conf /etc/apache2/conf-available/domjudge.conf
 sudo a2enmod rewrite
 sudo a2enconf domjudge
 sudo systemctl reload apache2
+sudo chown www-data:www-data -R /opt/domjudge/domserver/webapp/var/*
 ```
 
-注意，`ln` 命令中的 `username` 需要替换成你的实际用户名。
-
-现在你应该可以访问 `http://127.0.0.1/domjudge` 并使用用户名 `admin` 密码 `admin` 登录 domjudge 后台了。
+现在你应该可以访问 `http://127.0.0.1/domjudge` 并使用用户名 `admin` 与 `/opt/domjudge/domserver/etc/initial_admin_password.secret` 内生成的密码登录 domjudge 后台了。
 
 ### 配置 MySQL
 
-编辑 `/etc/mysql/my.cnf`，追加以下内容：
+编辑 `/etc/mysql/conf.d/mysql.cnf`，追加以下内容：
 
 ```cnf
-[mysql]
+[mysqld]
 max_connections = 1000
 max_allowed_packet = 16MB
 innodb_log_file_size = 48MB
@@ -95,7 +93,7 @@ sudo systemctl restart mysql
 
 ### 配置 PHP
 
-编辑 `~/domjudge/domserver/etc/apache.conf`，取消以下几行内容前的注释：
+编辑 `/opt/domjudge/domserver/etc/apache.conf`，取消以下几行内容前的注释：
 
 ```conf
 <IfModule mod_php7.c>
@@ -126,7 +124,7 @@ sudo systemctl restart apache2
 
 ## 配置 domserver
 
-访问 `http://127.0.0.1/domjudge`，使用用户名 `admin` 密码 `admin` 登录。
+访问 `http://127.0.0.1/domjudge`，使用用户名 `admin` 与 `/opt/domjudge/domserver/etc/initial_admin_password.secret` 内生成的密码登录。
 
 ### 修改 admin 密码
 
