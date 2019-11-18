@@ -6,7 +6,7 @@ Domjudge 7.1.1
 
 ## 环境
 
-Ubuntu 18.04.3 LTS，全新安装的系统
+Ubuntu 18.04.3 LTS
 
 ## 准备工作
 

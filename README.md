@@ -1,5 +1,21 @@
 # cn-xcpc-docs
 
-## 推荐食用指南
+## 食用指南
 
-system > domserver + judgehost > cds > presentation + resolver + coachview + icpc-live
+system：选手机环境的安装与配置
+
+domserver：Domjudge 服务端的安装与配置
+
+judgehost：Domjudge 评测端的安装与配置
+
+cds：ICPC Tools 中的 Contest Data Server 工具，是使用其他工具的核心 API
+
+resolver：滚榜工具
+
+presentation：大屏幕工具链
+
+coachview：远程显示选手机桌面与摄像头的工具
+
+icpc-live：直播 layout 工具
+
+board：外榜
