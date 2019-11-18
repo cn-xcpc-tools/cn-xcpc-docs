@@ -1,3 +1,5 @@
-# icpcdomdoc
+# cn-xcpc-docs
 
-A document about installing Domjudge 7.1.1 when holding a ICPC contest.
+## 推荐食用指南
+
+system > domserver + judgehost > cds > presentation + resolver + coachview + icpc-live

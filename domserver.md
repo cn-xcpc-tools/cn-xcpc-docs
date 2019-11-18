@@ -1,4 +1,4 @@
-# Domjudge 简易搭建文档（domserver 部分）
+# Domjudge server
 
 ## 版本
 
@@ -132,7 +132,7 @@ sudo systemctl restart apache2
 
 ### 设置 domserver
 
-访问 home 页面，点 Configuration settings 进行设置。技术组配置时主要注意修改 Score in seconds（如果为 no，那么在大量同罚时提交时有可能会出现 FB 不在榜首的情况，如果为 yes，那么排行榜会被样式挤得比较难看，请技术组自行抉择）、Show flags（显示国旗，因为大家都是一样的所以不显示就可以）、Show pending（是否在评测没出结果时显示在排行榜上，也影响了封榜后能否看到提交次数）、Show balloons postfreeze（封榜后是否还提示主办方发气球）、Compile penalty（编译错误是否计入罚时）、Enable printing（是否开启 domjudge 自带的打印功能）、Show relative time（是否以剩余时间显示比赛情况）。
+访问 home 页面，点 Configuration settings 进行设置。技术组配置时主要注意修改 Score in seconds（如果为 no，那么在大量同罚时提交时有可能会出现 FB 不在榜首的情况，如果为 yes，那么排行榜会被样式挤得比较难看，请技术组自行抉择）、Show flags（显示国旗）、Show pending（是否在评测没出结果时显示在排行榜上，也影响了封榜后能否看到提交次数）、Show balloons postfreeze（封榜后气球用户是否还收得到更新）、Compile penalty（编译错误是否计入罚时）、Enable printing（是否开启 domjudge 自带的打印功能）、Show relative time（是否以剩余时间显示比赛情况）等。
 
 除此之外的设置，可以交由出题组来完成，例如各项数值的限制。
 
@@ -161,3 +161,5 @@ sudo systemctl restart apache2
 ### 添加比赛
 
 访问 home 页面，点 Contests，点左下角的 add 按钮进行添加。
+
+## Troubleshooting
