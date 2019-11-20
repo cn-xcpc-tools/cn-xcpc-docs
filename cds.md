@@ -4,6 +4,12 @@
 
 wlp.CDS-2.1.2100
 
+## 环境
+
+Ubuntu 18.04.3 LTS
+Domjudge 7.1.1
+jre8
+
 ## 在 Domjudge 中创建 cds 用户
 
 在 Domjudge 中创建一个拥有 `API reader`、`API writer` 与 `Source code reader` 权限的用户并设置其密码。
