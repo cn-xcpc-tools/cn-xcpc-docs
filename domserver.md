@@ -85,7 +85,8 @@ max_allowed_packet = 16MB
 innodb_log_file_size = 48MB
 ```
 
-其中 `max_allowed_packet` 数值改成两倍于题目测试数据文件的大小，`innodb_log_file_size` 数值改成十倍于题目测试数据文件的大小。
+其中 `max_allowed_packet` 数值改成两倍于题目测试数据文件的大小，`innodb_log_file_size` 数值改成十倍于题目测试数据文件的大小。  
+若使用的是 mariadb，则 `/etc/mysql/mariadb.conf.d/50-server.cnf` 中 `max_allowed_packet` 一项也需要修改。
 
 ```shell
 sudo systemctl restart mysql
@@ -104,7 +105,7 @@ php_value memory_limit          512M
 </IfModule>
 ```
 
-编辑 `/etc/php/7.2/apache2/php.ini`，搜索 `date.timezone` 关键字，取消其行前注释，并将其值设为 `Asia/Shanghai`。
+编辑 `/etc/php/7.2/apache2/php.ini`，搜索 `date.timezone` 关键字，取消其行前注释，并将其值设为 `Asia/Shanghai`。搜索 `max_execution_time` 关键字，将其值由30改为300，防止生成队伍密码时 PHP 执行超时。
 
 ```shell
 sudo systemctl restart apache2
