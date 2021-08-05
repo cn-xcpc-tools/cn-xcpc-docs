@@ -16,15 +16,17 @@ presClient 用于大屏幕内容，presAdmin 用于管理不同大屏展示内�
 
 ### 管理端 presentationAdmin
 
-架设到方便操作的机器上。启动命令行为 `./presAdmin https://cds presAdmin 密码`。注意同时只能打开一个，否则会出现问题。
+架设到方便操作的机器上。启动命令行为 `./presAdmin https://cds presAdmin 密码`。注意同时只能打开一个，否则会出现问题。[文档参考](https://tools.icpc.global/docs/PresentationAdmin.pdf)
 
 ### 客户端 presentations
 
 架设到连接大屏幕的机器上，并接入 CDS 所在网络。
 
-`./client https://cds presentation 密码 --name "Screen 1" --display 1 --display_name "{team.display_name} ({org.formal_name})"`
+启动命令为 `./client https://cds presentation 密码 --name "Screen 1" --display 1 --display_name "{team.display_name} ({org.formal_name})"`。[文档参考](https://tools.icpc.global/docs/PresentationClient.pdf)
 
 由于自带字体不支持中文，需要设置 `ICPC_FONT` 环境变量。一般设置 DengXian 或者 Noto Sans CJK。
+
+请注意，如果你需要在一台电脑上开启多个 presClient，请将程序文件夹复制多个，并在不同的文件夹中启动，否则数据可能出现混乱。
 
 ### 使用
 
