@@ -164,3 +164,10 @@ sudo systemctl restart apache2
 访问 home 页面，点 Contests，点左下角的 add 按钮进行添加。
 
 ## Troubleshooting
+
+### 上传到最后几道题目时频繁超时
+
+前述 MySQL 配置主要针对上传过大测试数据时的 5xx 报错问题，如果上传最后几道题目出现超时，两个可选操作(推荐操作2)：
+
+1. 将 innodb_log_file_size 修改为两倍于所有题目测试数据文件的大小，重启 mysql
+2. 关闭 mysql，将 innodb_log_files_in_group 修改为 3，开启 mysql
