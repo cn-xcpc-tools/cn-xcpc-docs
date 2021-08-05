@@ -19,3 +19,5 @@ coachview: 远程显示选手机桌面与摄像头的工具
 icpc-live: 直播 layout 工具
 
 board: 外榜
+
+docker: Docker 方式安装 domserver 和 judgehost
