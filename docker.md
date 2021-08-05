@@ -104,7 +104,7 @@ sudo docker run -it --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro --name judg
 
 - 基于实际使用发现，不宜创建过多的`judgehost`，因为`judgehost`也是通过轮询的方式获取`submission`进行判题的，过多的`judgehost`会导致前端访问压力过大，容易导致崩溃或带宽耗尽等情况，所以请结合实际情况和服务器性能，合理部署适当数量的`judgehost`。根据北京理工的经验，开 11 个左右就能挡住 5k 提交了（虽然是在手动管理测评机池的情况下）。
 
-- Python 的测评容易导致 Judgehost 崩溃，莫名其妙。
+- 对于 Python 测评容易导致 Judgehost 崩溃的问题，这里给出一种解决方法（该方法也适用于需要添加新的评测语言的时候）： ① `docker exec -it [container_name] bash` 进入 Judgehost 容器内。 ② chroot 进入其中的 chroot 目录。 ③执行 `apt update/install` 进行安装即可。
 
 - 如果大面积挂掉的话检查网络。
 
