@@ -170,3 +170,6 @@ sudo systemctl restart apache2
 
 1. 将 innodb_log_file_size 修改为两倍于所有题目测试数据文件的大小，重启 mysql
 2. 关闭 mysql，将 innodb_log_files_in_group 修改为 3，开启 mysql
+
+### 3.mysqldump 时提示 `Got packet bigger than 'max_allowed_packet' when dumping 'XXX' at row xxx`  
+修改 `/etc/mysql/conf.d/mysqldump.cnf` 里的 `max_allowed_packet` 的值到合适大小后即可正常进行 `mysqldump`。
