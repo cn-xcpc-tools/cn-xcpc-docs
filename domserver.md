@@ -101,6 +101,12 @@ sudo ln -s /opt/domjudge/domserver/etc/apache.conf /etc/apache2/conf-available/d
 sudo a2enmod rewrite
 sudo a2enconf domjudge
 sudo systemctl reload apache2
+```
+确认 `/opt/domjudge/domserver/webapp/var/` 属 `www-data` 用户所有。
+稍早版本的 DOMJudge 安装时没有设置对应权限，见[相关 issue](https://github.com/DOMjudge/domjudge/issues/650)。
+
+如果权限不对，请执行下面的命令：
+```shell
 sudo chown www-data:www-data -R /opt/domjudge/domserver/webapp/var/*
 ```
 
