@@ -43,14 +43,14 @@ sudo apt install acl zip unzip mariadb-server apache2 \
 
 如果你使用 nginx + php-fpm，请 [TODO]。
 
-为防止后续 `configure` 步骤出错，接下来安装 `judgehost` 所需依赖
+为防止后续 `configure` 步骤出错，接下来安装 `judgehost` 所需的部分依赖
 
 ```shell
 sudo apt install make sudo unzip debootstrap libcgroup-dev lsof \
         php-cli php-curl php-json php-xml php-zip procps \
-        gcc g++ ghc fp-compiler default-jre-headless default-jdk-headless\
         libcurl4-gnutls-dev libjsoncpp-dev libmagic-dev
 ```
+
 
 ### 编译 DOMserver
 
