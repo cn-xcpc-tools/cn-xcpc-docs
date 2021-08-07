@@ -1,22 +1,24 @@
-# Contest Data Server（ICPC Tools）
+# Contest Data Server
 
-## 版本
+### 介绍
 
-wlp.CDS-2.1.2100
+在使用 ICPC Tools 工具链之前，需要配置一个 CDS 实例。具体用途可以参考[官方文档](https://tools.icpc.global/docs/ContestDataServer.pdf)。
 
-## 环境
+### 版本
 
-Ubuntu 18.04.3 LTS
-Domjudge 7.1.1
-jre8
+一般在 [Releases](https://github.com/icpctools/icpctools/releases) 中下载最新版的 `wlp.CDS-2.x.xxx.zip`。可以下载预览版。
 
-## 在 Domjudge 中创建 cds 用户
+### 环境
 
-在 Domjudge 中创建一个拥有 `API reader`、`API writer` 与 `Source code reader` 权限的用户并设置其密码。
+建议在搭建 DOMserver 的服务器上使用，记得安装 `openjdk-8-jre-headless`。
 
-## 配置 CDS
+### 在 DOMjudge 中创建 CDS 用户
 
-### cds/usr/servers/cds/config/cdsConfig.xml
+在 DOMjudge 中创建一个拥有 `API reader`、`API writer` 与 `Source code reader` 权限的用户并设置其密码。或者可以直接使用 admin 账户。
+
+### 配置 CDS
+
+##### cds/usr/servers/cds/config/cdsConfig.xml
 
 ```xml
 <cds>
@@ -32,11 +34,23 @@ jre8
 </cds>
 ```
 
-### cds/usr/servers/cds/users.xml
+##### cds/usr/servers/cds/users.xml
 
 自行修改该文件中的用户密码（注意不要修改用户名）
 
-## 启动 CDS
+| 用户名       | 解释                                           |
+| ------------ | ---------------------------------------------- |
+| admin        | 超级管理员用户，可以访问和修改所有数据         |
+| presAdmin    | presClient 管理员用户，用于 presAdmin 登录     |
+| blue         | 可以访问所有数据，但是不能控制工具链行为       |
+| balloon      | 用于气球发放的用户，一般用不到                 |
+| public       | 公共用户，无法读取封榜后提交评测结果和选手代码 |
+| presentation | 展示客户端用户                                 |
+| myicpc       | myicpc 用户，一般用不到                        |
+| live         | icpc-live 用户，用于提供直播数据               |
+| team1        | 队伍账户，用于 coachView 来看选手屏幕和        |
+
+### 启动 CDS
 
 前台启动：`cds/bin/server run cds`
 
@@ -46,4 +60,5 @@ jre8
 
 Web：`https://127.0.0.1:8443`
 
-## Troubleshooting
+### Troubleshooting
+
