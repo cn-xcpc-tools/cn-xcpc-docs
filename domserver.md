@@ -2,11 +2,11 @@
 
 ## 版本
 
-Domjudge 7.1.1
+Domjudge 7.3.3
 
 ## 环境
 
-Ubuntu 18.04.3 LTS
+Ubuntu 20.04 LTS / 21.04
 
 ## 准备工作
 
@@ -17,41 +17,36 @@ sudo apt-get upgrade && sudo apt-get update
 ```
 
 ```shell
-sudo apt install gcc g++ make zip unzip mariadb-server \
-        apache2 php php-cli libapache2-mod-php php-zip \
-        php-gd php-curl php-mysql php-json php-xml php-intl php-mbstring \
-        acl bsdmainutils ntp phpmyadmin python-pygments \
-        libcgroup-dev linuxdoc-tools linuxdoc-tools-text \
-        groff texlive-latex-recommended texlive-latex-extra \
-        texlive-fonts-recommended texlive-lang-european composer
+sudo apt install acl zip unzip mariadb-server apache2 \
+        php php-gd php-cli php-intl php-mbstring php-mysql \
+        php-curl php-json php-xml php-zip composer ntp
 ```
 
-安装时选择 `apache2`
+为防止后续`configure`步骤出错，接下来安装`judgehost`所需依赖
 
 ```shell
-sudo apt install libcurl4-gnutls-dev libjsoncpp-dev libmagic-dev
-```
-
-```shell
-sudo phpenmod json
+sudo apt install make sudo debootstrap libcgroup-dev lsof \
+        php-cli php-curl php-json php-xml php-zip procps \
+        gcc g++ ghc fp-compiler default-jre-headless default-jdk-headless\
+        libcurl4-gnutls-dev libjsoncpp-dev libmagic-dev
 ```
 
 ### 编译 Domjudge
 
 ```shell
 cd Downloads
-wget https://www.domjudge.org/releases/domjudge-7.1.1.tar.gz
+wget https://www.domjudge.org/releases/domjudge-7.3.3.tar.gz
 ```
 
 ```shell
-tar -zxvf domjudge-7.1.1.tar.gz
+tar -zxvf domjudge-7.3.3.tar.gz
 ```
 
 ```shell
-cd domjudge-7.1.1
+cd domjudge-7.3.3
 ./configure --prefix=/opt/domjudge --with-baseurl=127.0.0.1
-make domserver && sudo make install-domserver
-make docs && sudo make install-docs
+make domserver
+sudo make install-domserver
 ```
 
 ### 配置数据库
@@ -81,8 +76,8 @@ sudo chown www-data:www-data -R /opt/domjudge/domserver/webapp/var/*
 ```cnf
 [mysqld]
 max_connections = 1000
-max_allowed_packet = 16MB
-innodb_log_file_size = 48MB
+max_allowed_packet = 512MB
+innodb_log_file_size = 512MB
 ```
 
 其中 `max_allowed_packet` 数值改成两倍于题目测试数据文件的大小，`innodb_log_file_size` 数值改成十倍于题目测试数据文件的大小。  
@@ -94,18 +89,18 @@ sudo systemctl restart mysql
 
 ### 配置 PHP
 
-编辑 `/opt/domjudge/domserver/etc/apache.conf`，取消以下几行内容前的注释：
+编辑 `/opt/domjudge/domserver/etc/apache.conf`，取消以下几行内容前的注释（若没有，请在文件尾加上）：
 
 ```conf
 <IfModule mod_php7.c>
-php_value max_file_uploads      100
-php_value upload_max_filesize   128M
-php_value post_max_size         128M
-php_value memory_limit          512M
+php_value max_file_uploads      110
+php_value upload_max_filesize   512M
+php_value post_max_size         512M
+php_value memory_limit          1024M
 </IfModule>
 ```
 
-编辑 `/etc/php/7.2/apache2/php.ini`，搜索 `date.timezone` 关键字，取消其行前注释，并将其值设为 `Asia/Shanghai`。搜索 `max_execution_time` 关键字，将其值由30改为300，防止生成队伍密码时 PHP 执行超时。
+编辑 `/etc/php/7.4/apache2/php.ini`，搜索 `date.timezone` 关键字，取消其行前注释，并将其值设为 `Asia/Shanghai`。搜索 `max_execution_time` 关键字，将其值由30改为300，防止生成队伍密码时 PHP 执行超时。
 
 ```shell
 sudo systemctl restart apache2
@@ -149,7 +144,7 @@ sudo systemctl restart apache2
 
 ### 生成队伍密码
 
-访问 home 页面，点 Manage team passwords，选中 all teams 和 as userdata.tsv download。注意生成过的密码除了 userdata.tsv 不能在其他地方再被看到。
+访问 home 页面，点 Manage team passwords，选中 all teams 和 as userdata.tsv download（按需选中 All teams 或 Teams without password，点击生成，下载并保存好 `userdata.tsv` ）。**注意：** 生成过的密码除了 `userdata.tsv` 不能在其他地方再被看到。
 
 ### 添加题目
 
@@ -165,9 +160,16 @@ sudo systemctl restart apache2
 
 ## Troubleshooting
 
-### 上传到最后几道题目时频繁超时
+### 1.关于本地上传文件生成队伍及用户的中文编码的问题
+
+如果你需要使用文件导入的方式来进行队伍以及用户的生成，请注意 `DOMjudge` 只支持 **UTF-8** 文件编码的文件（无需担心本地转换完后中文乱码的问题，上传完就能够显示正常）。关于转码问题，可以使用Windows自带的文本编辑器，在另存为时选择 `UTF-8` 的文件编码保存，再将保存好的文件上传至domserver（在Jury界面的 `Import / export` 中）即可。关于文件名及格式问题，请参考ICPC官方wiki： `https://clics.ecs.baylor.edu/index.php?title=Contest_Control_System_Requirements#teams.tsv`  、  `https://clics.ecs.baylor.edu/index.php?title=Contest_Control_System_Requirements#accounts.tsv`  。
+
+### 2.上传到最后几道题目时频繁超时
 
 前述 MySQL 配置主要针对上传过大测试数据时的 5xx 报错问题，如果上传最后几道题目出现超时，两个可选操作(推荐操作2)：
 
 1. 将 innodb_log_file_size 修改为两倍于所有题目测试数据文件的大小，重启 mysql
 2. 关闭 mysql，将 innodb_log_files_in_group 修改为 3，开启 mysql
+
+### 3. mysqldump 时提示 `Got packet bigger than 'max_allowed_packet' when dumping 'XXX' at row xxx`  
+修改 `/etc/mysql/conf.d/mysqldump.cnf` 里的 `max_allowed_packet` 的值到合适大小后即可正常进行 `mysqldump`。
