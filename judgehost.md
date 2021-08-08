@@ -150,7 +150,7 @@ sudo systemctl enable domjudge-judgehost@3
 
 - 关于 judgehost 评测语言所需编译器的安装问题
 
-  先在运行 judgedaemon 的这个机器（宿主机器）上**安装好需要用到的语言的编译器**，保证可以通过该语言的 compile 脚本调用，然后 `sudo chroot /chroot/domjudge` 后利用 apt 安装你需要的语言编译器和运行时的安装。
+  先在运行 judgedaemon 的这个机器（宿主机器）上**安装好需要用到的语言的编译器**，保证可以通过该语言的 compile 脚本调用，然后 `sudo chroot /chroot/domjudge` 后利用 apt 安装你需要的语言的运行时。
 
 - 关于题目限制内存大小与 JAVA 报错的问题
 
