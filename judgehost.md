@@ -82,7 +82,7 @@ default http://example.edu/domjudge/api/  judgehosts  MzfJYWF5agSlUfmiGEy5mgkfqU
 如果你的服务器在国内，访问国外速度较慢，则考虑更换 chroot 环境中 apt 的源为合适的镜像。
 
 ```shell
-sudo sed -i 's,http://us.archive.ubuntu.com./ubuntu/,http://cn.archive.ubuntu.com/ubuntu,g' /opt/domjudge/judgehost/bin/dj_make_chroot
+sudo sed -i 's,http://us.archive.ubuntu.com/ubuntu/,http://cn.archive.ubuntu.com/ubuntu,g' /opt/domjudge/judgehost/bin/dj_make_chroot
 ```
 
 其中 `cn.archive.ubuntu.com` 也可以更换成其他源，例如 `mirrors.tuna.tsinghua.edu.cn`、`mirrors.aliyun.com`、`mirrors.cloud.aliyuncs.com`（在阿里云 ECS 上推荐）、`azure.archive.ubuntu.com`（在 Azure 上推荐）……
