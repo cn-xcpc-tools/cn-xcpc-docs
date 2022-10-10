@@ -4,7 +4,7 @@
 
 ### 版本
 
-DOMjudge 7.3.3
+DOMjudge 8.1.3
 
 ### 环境
 
@@ -37,7 +37,7 @@ sudo apt-get update
 
 ```shell
 sudo apt install acl zip unzip mariadb-server apache2 \
-        php php-gd php-cli php-intl php-mbstring php-mysql \
+        php php-fpm php-gd php-cli php-intl php-mbstring php-mysql \
         php-curl php-json php-xml php-zip composer ntp
 ```
 
@@ -46,18 +46,17 @@ sudo apt install acl zip unzip mariadb-server apache2 \
 为防止后续 `configure` 步骤出错，接下来安装 `judgehost` 所需的部分依赖
 
 ```shell
-sudo apt install make sudo unzip debootstrap libcgroup-dev lsof \
-        php-cli php-curl php-json php-xml php-zip procps \
-        libcurl4-gnutls-dev libjsoncpp-dev libmagic-dev
+sudo apt install make gcc g++ unzip debootstrap libcgroup-dev lsof \
+        procps libcurl4-gnutls-dev libjsoncpp-dev libmagic-dev 
 ```
 
 
 ### 编译 DOMserver
 
 ```shell
-wget https://www.domjudge.org/releases/domjudge-7.3.3.tar.gz
-tar -zxvf domjudge-7.3.3.tar.gz
-cd domjudge-7.3.3
+wget https://www.domjudge.org/releases/domjudge-8.1.3.tar.gz
+tar -zxvf domjudge-8.1.3.tar.gz
+cd domjudge-8.1.3
 ./configure
 make domserver
 sudo make install-domserver
@@ -96,16 +95,20 @@ sudo systemctl restart mysql
 执行以下命令。
 
 ```shell
-cd /opt/domjudge/domserver
 sudo ln -s /opt/domjudge/domserver/etc/apache.conf /etc/apache2/conf-available/domjudge.conf
-sudo a2enmod rewrite
-sudo a2enconf domjudge
-sudo systemctl reload apache2
+sudo ln -s /opt/domjudge/domserver/etc/domjudge-fpm.conf /etc/php/7.4/fpm/pool.d/domjudge.conf
+sudo a2enmod proxy_fcgi setenvif rewrite
+sudo a2enconf php7.4-fpm domjudge
+sudo systemctl reload apache2 php7.4-fpm
 ```
-确认 `/opt/domjudge/domserver/webapp/var/` 属 `www-data` 用户所有。
-稍早版本的 DOMJudge 安装时没有设置对应权限，见[相关 issue](https://github.com/DOMjudge/domjudge/issues/650)。
 
-如果权限不对，请执行下面的命令：
+注意根据实际情况替换此处php的版本
+
+~~确认 `/opt/domjudge/domserver/webapp/var/` 属 `www-data` 用户所有。
+稍早版本的 DOMJudge 安装时没有设置对应权限，见[相关 issue](https://github.com/DOMjudge/domjudge/issues/650)。~~
+
+~~如果权限不对，请执行下面的命令：~~
+
 ```shell
 sudo chown www-data:www-data -R /opt/domjudge/domserver/webapp/var/*
 ```
