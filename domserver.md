@@ -16,9 +16,9 @@ DOMjudge 8.1.3
 
 - **运行模式**
 
-  一般而言，我们可以让 DOMserver 运行在 apache2 + mod_php 或者 nginx + php-fpm 上。
+  一般而言，我们可以让 DOMserver 运行在 apache2 + php-fpm 或者 nginx + php-fpm 上。
 
-  如果你对 Linux 系统的运维不太熟悉的话，推荐使用全新安装且干净的操作系统，并使用 apache2 + mod_php。
+  如果你对 Linux 系统的运维不太熟悉的话，推荐使用全新安装且干净的操作系统，并使用 nginx + php-fpm。
 
   另外如果你已经安装了 mysql-server 而不是 mariadb-server，那么下方部分指令可能会出现区别，需要一定的经验。
 
@@ -33,21 +33,21 @@ sudo apt-get upgrade
 sudo apt-get update
 ```
 
-如果你使用 apache2 + mod_php，请按以下安装。
+如果你使用 nginx + php-fpm，请按以下安装。
 
 ```shell
-sudo apt install acl zip unzip mariadb-server apache2 \
-        php php-fpm php-gd php-cli php-intl php-mbstring php-mysql \
+sudo apt install acl zip unzip mariadb-server nginx \
+        php-fpm php-gd php-cli php-intl php-mbstring php-mysql \
         php-curl php-json php-xml php-zip composer ntp
 ```
 
-如果你使用 nginx + php-fpm，请 [TODO]。
+如果你使用 apache2 + php-fpm，请 [TODO] 或者参考[官方文档](https://www.domjudge.org/docs/manual/8.0/install-domserver.html#installation-of-the-domserver)。
 
 为防止后续 `configure` 步骤出错，接下来安装 `judgehost` 所需的部分依赖
 
 ```shell
-sudo apt install make gcc g++ unzip debootstrap libcgroup-dev lsof \
-        procps libcurl4-gnutls-dev libjsoncpp-dev libmagic-dev 
+sudo apt install make gcc g++ debootstrap libcgroup-dev lsof \
+        procps libcurl4-gnutls-dev libjsoncpp-dev libmagic-dev
 ```
 
 
@@ -90,19 +90,18 @@ sudo systemctl restart mysql
 
 ### 配置 Web 服务器
 
-#### apache2 + mod_php
+#### nginx + php_fpm
 
 执行以下命令。
 
 ```shell
-sudo ln -s /opt/domjudge/domserver/etc/apache.conf /etc/apache2/conf-available/domjudge.conf
+sudo ln -s /opt/domjudge/domserver/etc/nginx-conf /etc/nginx/sites-enabled/domjudge
 sudo ln -s /opt/domjudge/domserver/etc/domjudge-fpm.conf /etc/php/7.4/fpm/pool.d/domjudge.conf
-sudo a2enmod proxy_fcgi setenvif rewrite
-sudo a2enconf php7.4-fpm domjudge
-sudo systemctl reload apache2 php7.4-fpm
+sudo service php7.4-fpm reload
+sudo service nginx reload
 ```
 
-注意根据实际情况替换此处php的版本
+注意根据实际情况替换此处php的版本，执行完成后可以访问 `http://127.0.0.1/domjudge`测试是否正常运行，如果打不开请检查`/etc/nginx/sites-enabled`下是否有其他配置文件与domjudge冲突。
 
 ~~确认 `/opt/domjudge/domserver/webapp/var/` 属 `www-data` 用户所有。
 稍早版本的 DOMJudge 安装时没有设置对应权限，见[相关 issue](https://github.com/DOMjudge/domjudge/issues/650)。~~
@@ -113,34 +112,18 @@ sudo systemctl reload apache2 php7.4-fpm
 sudo chown www-data:www-data -R /opt/domjudge/domserver/webapp/var/*
 ```
 
-编辑 `/opt/domjudge/domserver/etc/apache.conf`，取消以下几行内容前的注释（若没有，请在文件尾加上）：
-
-```conf
-<IfModule mod_php7.c>
-php_value max_file_uploads      110
-php_value upload_max_filesize   512M
-php_value post_max_size         512M
-php_value memory_limit          1024M
-</IfModule>
-```
-
-编辑 `/etc/php/7.4/apache2/php.ini`，搜索 `date.timezone` 关键字，取消其行前注释，并将其值设为 `Asia/Shanghai`。搜索 `max_execution_time` 关键字，将其值由30改为300，防止生成队伍密码时 PHP 执行超时。
-
-编辑 `/etc/apache2/apache2.conf`，搜索 `KeepAlive` 关键字，将其值设为 `Off`，并在其后新增一行内容：
-
-```conf
-MaxClients 1000
-```
-
-重启 apache 服务。
+编辑 `/opt/domjudge/domserver/etc/domjudge-fpm.conf`，取消最后一行 `php_admin_value[date.timezone]` 注释，并将其值设为 `Asia/Shanghai`。
+编辑 `/etc/php/7.4/fpm/php.ini` 搜索 `max_execution_time` 关键字，将其值由30改为300，防止生成队伍密码时 PHP 执行超时。
 
 ```shell
-sudo systemctl restart apache2
+sudo service nginx reload
+sudo service php7.4-fpm reload
 ```
 
-#### nginx + php-fpm
+#### apache2 + php-fpm
 
 [TODO]
+此处你可以参考[官方文档](https://www.domjudge.org/docs/manual/8.0/install-domserver.html#installation-of-the-domserver)。
 
 ## 配置 domserver
 
@@ -237,6 +220,8 @@ sudo systemctl restart apache2
   1. 将 innodb_log_file_size 修改为至少两倍于所有题目测试数据文件的大小，重启 mysql
 
   2. 关闭 mysql，将 innodb_log_files_in_group 修改为 3，开启 mysql
+
+  3. 调整`/opt/domjudge/domserver/etc/domjudge-fpm.conf`中关于文件大小的参数
 
 - mysqldump 失败，提示 Got packet bigger than 'max_allowed_packet' when dumping 'XXX' at row xxx
 
