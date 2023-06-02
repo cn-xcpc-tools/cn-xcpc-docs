@@ -20,6 +20,8 @@
 award /path/of/event-feed --medals {gold} {silver} {bronze} --rank 3 --fts true true
 ```
 
+或者也可以直接打开awards.bat，会打开一个带GUI的程序，可以选择event-feed文件，也可以在GUI中添加奖项，然后点击save，保存为event-feed.json文件即可。
+
 ### 手工修改生成后的 event-feed
 
 * 删除不在榜单上出现的 team （尤其是带有容易引发 `resolver` 报错的空字段的）
@@ -34,9 +36,22 @@ award /path/of/event-feed --medals {gold} {silver} {bronze} --rank 3 --fts true 
 resolver /path/of/event-feed.award --display_name "{team.display_name}（{org.formal_name}）" --fast 0.15
 ```
 
-其中 `--fast` 参数的值影响滚榜时进行两次动画的间隙时间。
+其中 `--fast` 参数的值影响滚榜时进行两次动画的间隙时间，加入`--singleStep 999`可以从一开始就单步执行。如果不加会发现点到一个队伍的pending的题目的时候，点了鼠标没有反应，过一会儿会自动显示题目的情况。
+
 
 参数具体可参考[官方文档](https://tools.icpc.global/docs/Resolver.pdf)。
+
+
+
+## 关于加入队伍照片和学校logo
+
+首先需要强调的是，不同版本的resolver可能有一些不同，以下内容对2.4.727版本适用。
+
+学校logo命名为logo.jpg（jpeg可能会显示不出来，不知道为什么），保存在CDP/organizations/{school_id}/logo.jpg。其中school_id为在domjudge上的team affilications的id。
+
+队伍照片命名为photo.jpg，保存在CDP/teams/{team_id}/photo.jpg。team_id就是在domjudge上的队伍id。
+
+然后把event-feed.json放在CDP文件夹。运行`resolver ./CDP`即可，不要再加event-feed.json文件，不然会不显示图片。
 
 ## Troubleshooting
 
@@ -50,4 +65,4 @@ resolver /path/of/event-feed.award --display_name "{team.display_name}（{org.fo
 
 * 运行时内存超限崩溃
 
-  队伍数较多时且有照片则可能出现。请考虑修改 `resolver.bat` 或 `resolver.sh` 中的 Java 虚拟机参数。
+  队伍数较多时且有照片则可能出现。请考虑修改 `resolver.bat` 或 `resolver.sh` 中的 Java 虚拟机参数，请注意，根据经验，最好把-xmx后面的大小改为16GB以上，2022年ecfinal使用的大小为20GB。

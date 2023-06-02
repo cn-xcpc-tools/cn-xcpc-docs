@@ -4,7 +4,7 @@
 
 ### 版本
 
-DOMjudge 7.3.3
+DOMjudge 8.1.3
 
 ### 环境
 
@@ -32,10 +32,10 @@ sudo apt install make unzip debootstrap libcgroup-dev lsof \
 
 ```shell
 cd Downloads
-wget https://www.domjudge.org/releases/domjudge-7.3.3.tar.gz
-tar -zxvf domjudge-7.3.3.tar.gz
+wget https://www.domjudge.org/releases/domjudge-8.1.3.tar.gz
+tar -zxvf domjudge-8.1.3.tar.gz
 
-cd domjudge-7.3.3
+cd domjudge-8.1.3
 ./configure
 make judgehost
 sudo make install-judgehost
