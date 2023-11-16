@@ -4,11 +4,11 @@
 
 ### 版本
 
-DOMjudge 7.3.3
+DOMjudge 8.2.0
 
 ### 环境
 
-Ubuntu 18.04 LTS / 20.04 LTS / 21.04
+Ubuntu 20.04 LTS / 22.04 LTS
 
 ## 准备工作
 
@@ -20,11 +20,13 @@ Ubuntu 18.04 LTS / 20.04 LTS / 21.04
 sudo apt upgrade
 sudo apt update
 
-sudo apt install make unzip debootstrap libcgroup-dev lsof \
+sudo apt install make nano vim unzip debootstrap libcgroup-dev lsof \
       php-cli php-curl php-json php-xml php-zip procps \
       gcc g++ default-jre-headless default-jdk-headless \
       ghc fp-compiler
 ```
+#### 移除有冲突的软件
+一些系统 (例如 Ubuntu) 预装apport，这个软件和判题服务发生冲突，使用`sudo apt remove apport`移除，否则可能导致一些奇怪的问题（例如该T的时候不T，一直显示JUDGING）。
 
 ### 编译 judgehost
 
@@ -32,10 +34,10 @@ sudo apt install make unzip debootstrap libcgroup-dev lsof \
 
 ```shell
 cd Downloads
-wget https://www.domjudge.org/releases/domjudge-7.3.3.tar.gz
-tar -zxvf domjudge-7.3.3.tar.gz
+wget https://www.domjudge.org/releases/domjudge-8.2.0.tar.gz
+tar -zxvf domjudge-8.2.0.tar.gz
 
-cd domjudge-7.3.3
+cd domjudge-8.2.0
 ./configure
 make judgehost
 sudo make install-judgehost
@@ -77,12 +79,13 @@ default http://example.edu/domjudge/api/  judgehosts  MzfJYWF5agSlUfmiGEy5mgkfqU
 
 格式为 `endpoint api_url username password`，其中用 tab 进行缩进。`endpoint` 可以保持不变，`api_url` 根据 domserver 的地址进行修改，`username` 和 `password` 一般从 domserver 上的 `etc/restapi.secret` 读取，该文件会在安装 domserver 时预生成，其实也可以在后台创建自己的 judgehost 用户或者修改 judgehost 密码。可以用这种方式连接多台 domserver。
 
+
 ### 构建 chroot 环境
 
 如果你的服务器在国内，访问国外速度较慢，则考虑更换 chroot 环境中 apt 的源为合适的镜像。
 
 ```shell
-sudo sed -i 's,http://us.archive.ubuntu.com./ubuntu/,http://cn.archive.ubuntu.com/ubuntu,g' /opt/domjudge/judgehost/bin/dj_make_chroot
+sudo sed -i 's,http://us.archive.ubuntu.com/ubuntu/,http://cn.archive.ubuntu.com/ubuntu,g' /opt/domjudge/judgehost/bin/dj_make_chroot
 ```
 
 其中 `cn.archive.ubuntu.com` 也可以更换成其他源，例如 `mirrors.tuna.tsinghua.edu.cn`、`mirrors.aliyun.com`、`mirrors.cloud.aliyuncs.com`（在阿里云 ECS 上推荐）、`azure.archive.ubuntu.com`（在 Azure 上推荐）……
@@ -91,12 +94,24 @@ sudo sed -i 's,http://us.archive.ubuntu.com./ubuntu/,http://cn.archive.ubuntu.co
 
 完成上述修改后**保存并运行此脚本**。这一步会从源上下载必要的软件包，所以请耐心等待。
 
+
+
 ### 设置 cgroup
 
 使用 `vim`、`nano` 等文本编辑器编辑 `/etc/default/grub` 这个文件，对其中的 `GRUB_CMDLINE_LINUX_DEFAULT` 中添加 `cgroup_enable=memory swapaccount=1`，例如：
 
 ```text
 GRUB_CMDLINE_LINUX_DEFAULT="quiet cgroup_enable=memory swapaccount=1"
+```
+
+可选：禁止操作系统在运行判题服务的核心上调度其他任务，让判题机更加稳定:
+```text
+GRUB_CMDLINE_LINUX_DEFAULT="quiet cgroup_enable=memory swapaccount=1 isolcpus=2"
+```
+
+对于 Debian,Ubuntu 等操作系统，我们需要添加`systemd.unified_cgroup_hierarchy=0`：
+```text
+GRUB_CMDLINE_LINUX_DEFAULT="quiet cgroup_enable=memory swapaccount=1 systemd.unified_cgroup_hierarchy=0"
 ```
 
 **注意**：如果你在使用由 Azure、Google Cloud Platform 或 DigitalOcean 提供的虚拟服务器，请注意官方文档中的 `On VM hosting providers such as Google Cloud or DigitalOcean, GRUB_CMDLINE_LINUX_DEFAULT may be overwritten by other files in /etc/default/grub.d/` 请 cd 进入该目录后，在里面的 `.conf` 文件里进行相关的更改。
@@ -110,6 +125,11 @@ sudo update-grub
 之后**重启计算机**。重启计算机后可以通过 `cat /proc/cmdline` 中是否有 `cgroup_enable=memory swapaccount=1` 验证是否安装成功。
 
 ### 测试启动 judgehost
+首先，我们要为Domjudge 创建一个新用户，并且授予文件所有权：
+```shell
+sudo useradd -m domjudge
+sudo chown -R domjudge /opt/domjudge/judgehost
+```
 
 在每次开机后，需要运行以下脚本初始化 cgroups。
 
@@ -117,7 +137,7 @@ sudo update-grub
 sudo /opt/domjudge/judgehost/bin/create_cgroups
 ```
 
-然后可以通过
+然后可以切换到domjudge用户，通过
 
 ```shell
 /opt/domjudge/judgehost/bin/judgedaemon
@@ -128,23 +148,21 @@ sudo /opt/domjudge/judgehost/bin/create_cgroups
 ### 利用 systemd 配置开机自启动
 
 ```shell
-sudo cp /opt/domjudge/lib/systemd/system/domjudge-judgehost.service /opt/domjudge/lib/systemd/system/domjudge-judgehost@.service
-sudo sed -i 's/judgedaemon -n 0/judgedaemon -n %i/g' /opt/domjudge/lib/systemd/system/domjudge-judgehost@.service
-sudo ln -s /opt/domjudge/lib/systemd/system/domjudge-judgehost@.service /lib/systemd/system/
-sudo ln -s /opt/domjudge/lib/systemd/system/create-cgroups.service /lib/systemd/system/
+sudo ln -s /home/c004/domjudge-8.2.0/judge/domjudge-judgedaemon@.service /lib/systemd/system/
+sudo ln -s /home/c004/domjudge-8.2.0/judge/create-cgroups.service /lib/systemd/system/
 sudo systemctl enable create-cgroups
 ```
 
 启动四个 `judgehost`（按需开启，照葫芦画瓢即可）：
 
 ```shell
-sudo systemctl enable domjudge-judgehost@0
-sudo systemctl enable domjudge-judgehost@1
-sudo systemctl enable domjudge-judgehost@2
-sudo systemctl enable domjudge-judgehost@3
+sudo systemctl enable domjudge-judgedaemon@0
+sudo systemctl enable domjudge-judgedaemon@1
+sudo systemctl enable domjudge-judgedaemon@2
+sudo systemctl enable domjudge-judgedaemon@3
 ```
 
-`judgedaemon`的日志会保存在 `/opt/domjudge/judgehost/log/` 下。可以通过 `sudo systemctl status domjudge-judgehost@0` 或者 `journalctl -u domjudge-judgehost@0` 查看日志。
+`judgedaemon`的日志会保存在 `/opt/domjudge/judgehost/log/` 下。可以通过 `sudo systemctl status domjudge-judgedaemon@0` 或者 `journalctl -u domjudge-judgedaemon@0` 查看日志。
 
 ## Troubleshooting
 
