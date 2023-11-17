@@ -24,6 +24,10 @@ presClient 用于大屏幕内容，presAdmin 用于管理不同大屏展示内�
 
 启动命令为 `./client https://cds presentation 密码 --name "Screen 1" --display 1 --display_name "{team.display_name} ({org.formal_name})"`。[文档参考](https://tools.icpc.global/docs/PresentationClient.pdf)
 
+在较新的版本中，可能需要在链接后额外添加`/api/`，即启动命令变为：`./client https://cds/api/ presentation 密码 --name "Screen 1" --display 1 --display_name "{team.display_name} ({org.formal_name})"`。(例如：`./client https://192.168.1.10:8443/api/ presentation presentat1on --name "Screen 1" --display 1 --display_name "{team.display_name} ({org.formal_name})"`(cds部署在局域网下，服务器IP为`192.168.1.10`，CDS服务器监听端口为`8443`, 账户名为`presentation`, 密码为`presentat1on`)
+
+此外，默认策略下，不允许使用管理员账户(`admin`)登录presentations client。
+
 由于自带字体不支持中文，需要设置 `ICPC_FONT` 环境变量。一般设置 DengXian 或者 Noto Sans CJK。
 
 请注意，如果你需要在一台电脑上开启多个 presClient，请将程序文件夹复制多个，并在不同的文件夹中启动，否则数据可能出现混乱。
